@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS - Secure AI Terminal</title>
+    <title>JARVIS - Custom Terminal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -23,7 +23,7 @@
             background: rgba(0, 240, 255, 0.02);
             box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
             text-align: center;
-            max-width: 600px;
+            max-width: 550px;
             width: 95%;
         }
         .widgets {
@@ -58,19 +58,18 @@
             letter-spacing: 2px;
         }
         .console {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(0, 240, 255, 0.4);
             border-radius: 8px;
             padding: 15px;
             text-align: left;
-            height: 200px;
+            height: 150px;
             overflow-y: auto;
             margin-bottom: 15px;
             font-size: 0.9rem;
             color: #8ab4f8;
-            line-height: 1.4;
         }
-        .console-line { margin-bottom: 8px; }
+        .console-line { margin-bottom: 5px; }
         .console-jarvis { color: #00f0ff; font-weight: bold; }
         .input-box {
             display: flex;
@@ -81,7 +80,7 @@
             background: rgba(5, 11, 20, 0.8);
             border: 1px solid #00f0ff;
             border-radius: 5px;
-            padding: 12px;
+            padding: 10px;
             color: #00f0ff;
             font-family: inherit;
             outline: none;
@@ -120,15 +119,15 @@
         </div>
 
         <div class="arc-reactor"></div>
-        <h1>JARVIS AI V-2.1</h1>
-        <div class="status" id="system-status">// QUANTUM CORE: ONLINE</div>
+        <h1>JARVIS CORE</h1>
+        <div class="status">// SYSTEM STATUS: SECURE</div>
 
         <div class="console" id="console-output">
-            <div class="console-line"><span class="console-jarvis">Джарвіс:</span> Системи готові. Якщо ви запускаєте ШІ вперше, введіть команду <span style="color:#fff; background:rgba(0,240,255,0.2); padding: 2px 5px; border-radius:3px;">key</span> для налаштування мізків.</div>
+            <div class="console-line"><span class="console-jarvis">Джарвіс:</span> Автономні протоколи активовані, сер. Системи захищені та працюють без хмарних збоїв. Введіть <span style="color: #fff">help</span> для списку можливостей.</div>
         </div>
 
         <div class="input-box">
-            <input type="text" id="user-command" placeholder="Запитайте щось або введіть 'key'..." autofocus>
+            <input type="text" id="user-command" placeholder="Введіть команду або питання..." autofocus>
             <button class="btn" onclick="sendCommand()">Дія</button>
         </div>
     </div>
@@ -160,79 +159,43 @@
             consoleOutput.scrollTop = consoleOutput.scrollHeight;
         }
 
-        async function askGeminiAI(userText) {
-            // Беремо ключ із пам'яті браузера
-            const savedKey = localStorage.getItem('jarvis_gemini_key');
-            
-            if (!savedKey) {
-                printToConsole('Джарвіс', 'Помилка: Ключ ШІ не знайдено. Введіть команду "key", щоб налаштувати його.', true);
-                return;
-            }
-
-            const statusLabel = document.getElementById('system-status');
-            statusLabel.innerText = "// JARVIS IS THINKING...";
-            statusLabel.style.color = "#ffaa00";
-
-            try {
-                const systemPrompt = "Ти — Джарвіс, суперінтелект та особистий асистент Тоні Старка. Відповідай українською мовою, коротко, впевнено і ввічливо, використовуючи звертання 'сер'. Твоя відповідь:";
-                
-                const response = await fetch(`https://googleapis.com{savedKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt + " " + userText }] }]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    if (data.error.message.includes('API key not valid')) {
-                        printToConsole('Джарвіс', 'Помилка: Ваш API-ключ заблокований або недійсний. Створіть новий ключ у Google AI Studio і введіть команду "key", щоб оновити.', true);
-                    } else {
-                        printToConsole('Джарвіс', 'Помилка ШІ: ' + data.error.message, true);
-                    }
-                } else {
-                    const aiResponse = data.candidates[0].content.parts[0].text;
-                    printToConsole('Джарвіс', aiResponse, true);
-                }
-            } catch (error) {
-                printToConsole('Джарвіс', 'Помилка мережі. Спробуйте ще раз.', true);
-                console.error(error);
-            }
-
-            statusLabel.innerText = "// QUANTUM CORE: ONLINE";
-            statusLabel.style.color = "#00ff66";
-        }
-
         function sendCommand() {
-            const cmd = inputField.value.trim();
+            const cmd = inputField.value.trim().toLowerCase();
             if (!cmd) return;
 
-            printToConsole('Ви', cmd, false);
+            printToConsole('Ви', inputField.value, false);
             inputField.value = '';
 
-            const lowCmd = cmd.toLowerCase();
-
-            if (lowCmd === 'help') {
-                printToConsole('Джарвіс', 'Доступні команди: key, clear, youtube, google. Або просто пишіть будь-які питання для ШІ!', true);
-            } else if (lowCmd === 'clear') {
-                document.getElementById('console-output').innerHTML = '';
-            } else if (lowCmd === 'key') {
-                const userKey = prompt('Будь ласка, вставте ваш API Ключ від Google Gemini:');
-                if (userKey) {
-                    localStorage.setItem('jarvis_gemini_key', userKey.trim());
-                    printToConsole('Джарвіс', 'Ключ ШІ успішно збережено в пам\'ять браузера! Тепер можете ставити запитання.', true);
+            setTimeout(() => {
+                // База знань Джарвіса
+                if (cmd === 'help' || cmd === 'допомога') {
+                    printToConsole('Джарвіс', 'Доступні запити: статус, привіт, хто твій творець, анекдот, ютуб, гугл, очистити.', true);
+                } else if (cmd === 'статус' || cmd === 'status') {
+                    printToConsole('Джарвіс', 'Усі системи стабільні. Процесор: 24%. Температура реактора: 42°C. Захист: Максимальний.', true);
+                } else if (cmd === 'clear' || cmd === 'очистити') {
+                    document.getElementById('console-output').innerHTML = '';
+                } else if (cmd === 'привіт' || cmd === 'hello' || cmd === 'хай') {
+                    printToConsole('Джарвіс', 'З поверненням, сер! Чим можу допомогти сьогодні?', true);
+                } else if (cmd === 'хто твій творець' || cmd === 'хто тебе створив') {
+                    printToConsole('Джарвіс', 'Я був розроблений найкращим інженером Stark Industries (тобто вами, сер!).', true);
+                } else if (cmd === 'анекдот' || cmd === 'розкажи анекдот') {
+                    const jokes = [
+                        "Чому роботам ніколи не буває самотньо? Бо у них всередині багато платформ для спілкування!",
+                        "Скільки програмістів потрібно, щоб закрутити лампочку? Жодного, це апаратна проблема.",
+                        "Заходить робот у бар і каже: 'Мені щось для розгону'. Бармен наливає йому моторне мастило."
+                    ];
+                    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+                    printToConsole('Джарвіс', randomJoke, true);
+                } else if (cmd === 'youtube' || cmd === 'ютуб') {
+                    printToConsole('Джарвіс', 'Відкриваю YouTube у новій вкладці...', true);
+                    window.open('https://youtube.com', '_blank');
+                } else if (cmd === 'google' || cmd === 'гугл') {
+                    printToConsole('Джарвіс', 'Запускаю Google...', true);
+                    window.open('https://google.com', '_blank');
+                } else {
+                    printToConsole('Джарвіс', 'Запит оброблено локально. Я не знайшов готового сценарію для цієї фрази. Спробуйте запитати щось інше або напишіть "help".', true);
                 }
-            } else if (lowCmd === 'youtube' || lowCmd === 'ютуб') {
-                printToConsole('Джарвіс', 'Відкриваю YouTube, сер...', true);
-                window.open('https://youtube.com', '_blank');
-            } else if (lowCmd === 'google' || lowCmd === 'гугл') {
-                printToConsole('Джарвіс', 'Запускаю Google...', true);
-                window.open('https://google.com', '_blank');
-            } else {
-                askGeminiAI(cmd);
-            }
+            }, 300);
         }
     </script>
 </body>
