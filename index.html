@@ -1,2 +1,100 @@
-<h1>Мій перший сайт на GitHub!</h1>
-<p>Вітаю, сайт успішно запущено.</p>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS - Control Panel</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #050b14;
+            color: #00f0ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .panel {
+            border: 2px solid #00f0ff;
+            padding: 40px;
+            border-radius: 15px;
+            background: rgba(0, 240, 255, 0.03);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        .arc-reactor {
+            width: 80px;
+            height: 80px;
+            border: 4px dashed #00f0ff;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: rotate 6s linear infinite;
+            box-shadow: 0 0 15px #00f0ff;
+        }
+        h1 {
+            font-size: 2rem;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+        .status {
+            color: #00ff66;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: blink 1.5s infinite;
+        }
+        p {
+            color: #8ab4f8;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            background: transparent;
+            color: #00f0ff;
+            border: 1px solid #00f0ff;
+            padding: 12px 30px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #00f0ff;
+            color: #050b14;
+            box-shadow: 0 0 15px #00f0ff;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <div class="arc-reactor"></div>
+        <h1>JARVIS V-1.0</h1>
+        <div class="status">// SYSTEM: ONLINE</div>
+        <p>Ласкаво просимо, сер. Усі протоколи безпеки активовані. Готовий до виконання ваших вказівок.</p>
+        <a href="#" class="btn" onclick="alert('Протокол активовано!')">Запустити системи</a>
+    </div>
+
+</body>
+</html>
