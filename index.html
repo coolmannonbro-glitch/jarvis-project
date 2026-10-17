@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS - AI Quantum Terminal</title>
+    <title>JARVIS - Secure AI Terminal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -120,23 +120,20 @@
         </div>
 
         <div class="arc-reactor"></div>
-        <h1>JARVIS AI V-2.0</h1>
+        <h1>JARVIS AI V-2.1</h1>
         <div class="status" id="system-status">// QUANTUM CORE: ONLINE</div>
 
         <div class="console" id="console-output">
-            <div class="console-line"><span class="console-jarvis">Джарвіс:</span> Штучний інтелект підключено, сер. Я готовий до будь-яких запитань!</div>
+            <div class="console-line"><span class="console-jarvis">Джарвіс:</span> Системи готові. Якщо ви запускаєте ШІ вперше, введіть команду <span style="color:#fff; background:rgba(0,240,255,0.2); padding: 2px 5px; border-radius:3px;">key</span> для налаштування мізків.</div>
         </div>
 
         <div class="input-box">
-            <input type="text" id="user-command" placeholder="Запитайте щось у Джарвіса..." autofocus>
+            <input type="text" id="user-command" placeholder="Запитайте щось або введіть 'key'..." autofocus>
             <button class="btn" onclick="sendCommand()">Дія</button>
         </div>
     </div>
 
     <script>
-        // ВСТАВ СВІЙ API КЛЮЧ СЮДИ В ДУЖКИ:
-        const GEMINI_API_KEY = "AQ.Ab8RN6Jesi7Gn5Vc2qC83DZ57M98PtDx-SjaEIaoTtWpvyZtGA";
-
         function updateDateTime() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
@@ -164,15 +161,22 @@
         }
 
         async function askGeminiAI(userText) {
+            // Беремо ключ із пам'яті браузера
+            const savedKey = localStorage.getItem('jarvis_gemini_key');
+            
+            if (!savedKey) {
+                printToConsole('Джарвіс', 'Помилка: Ключ ШІ не знайдено. Введіть команду "key", щоб налаштувати його.', true);
+                return;
+            }
+
             const statusLabel = document.getElementById('system-status');
             statusLabel.innerText = "// JARVIS IS THINKING...";
             statusLabel.style.color = "#ffaa00";
 
             try {
-                // Додаємо інструкцію для ШІ, щоб він поводився як Джарвіс
                 const systemPrompt = "Ти — Джарвіс, суперінтелект та особистий асистент Тоні Старка. Відповідай українською мовою, коротко, впевнено і ввічливо, використовуючи звертання 'сер'. Твоя відповідь:";
                 
-                const response = await fetch(`https://googleapis.com{GEMINI_API_KEY}`, {
+                const response = await fetch(`https://googleapis.com{savedKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -181,10 +185,19 @@
                 });
 
                 const data = await response.json();
-                const aiResponse = data.candidates[0].content.parts[0].text;
-                printToConsole('Джарвіс', aiResponse, true);
+                
+                if (data.error) {
+                    if (data.error.message.includes('API key not valid')) {
+                        printToConsole('Джарвіс', 'Помилка: Ваш API-ключ заблокований або недійсний. Створіть новий ключ у Google AI Studio і введіть команду "key", щоб оновити.', true);
+                    } else {
+                        printToConsole('Джарвіс', 'Помилка ШІ: ' + data.error.message, true);
+                    }
+                } else {
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    printToConsole('Джарвіс', aiResponse, true);
+                }
             } catch (error) {
-                printToConsole('Джарвіс', 'Помилка доступу до нейромережі. Перевірте API ключ у коді.', true);
+                printToConsole('Джарвіс', 'Помилка мережі. Спробуйте ще раз.', true);
                 console.error(error);
             }
 
@@ -201,20 +214,23 @@
 
             const lowCmd = cmd.toLowerCase();
 
-            // Звичайні швидкі команди
             if (lowCmd === 'help') {
-                printToConsole('Джарвіс', 'Доступні локальні команди: clear, youtube, google. Або просто пишіть мені будь-які питання як ШІ!', true);
+                printToConsole('Джарвіс', 'Доступні команди: key, clear, youtube, google. Або просто пишіть будь-які питання для ШІ!', true);
             } else if (lowCmd === 'clear') {
                 document.getElementById('console-output').innerHTML = '';
+            } else if (lowCmd === 'key') {
+                const userKey = prompt('Будь ласка, вставте ваш API Ключ від Google Gemini:');
+                if (userKey) {
+                    localStorage.setItem('jarvis_gemini_key', userKey.trim());
+                    printToConsole('Джарвіс', 'Ключ ШІ успішно збережено в пам\'ять браузера! Тепер можете ставити запитання.', true);
+                }
             } else if (lowCmd === 'youtube' || lowCmd === 'ютуб') {
                 printToConsole('Джарвіс', 'Відкриваю YouTube, сер...', true);
                 window.open('https://youtube.com', '_blank');
             } else if (lowCmd === 'google' || lowCmd === 'гугл') {
                 printToConsole('Джарвіс', 'Запускаю Google...', true);
                 window.open('https://google.com', '_blank');
-            } 
-            // Якщо це не команда — надсилаємо в ШІ Gemini!
-            else {
+            } else {
                 askGeminiAI(cmd);
             }
         }
